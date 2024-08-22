@@ -127,7 +127,6 @@ const AssignExtensionModal = ({ defaultExtension, defaultUsername, onClose }: As
 										placeholder={t('Select_an_option')}
 										value={field.value}
 										onChange={field.onChange}
-										data-testid='input-free-extension-numbers'
 									/>
 								)}
 							/>
