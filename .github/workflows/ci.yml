@@ -423,7 +423,7 @@ jobs:
       enterprise-license: ${{ needs.release-versions.outputs.enterprise-license }}
       shard: '[1, 2, 3, 4, 5]'
       total-shard: 5
-      mongodb-version: "['6.0']"
+      mongodb-version: "['7.0']"
       node-version: ${{ needs.release-versions.outputs.node-version }}
       lowercase-repo: ${{ needs.release-versions.outputs.lowercase-repo }}
       rc-dockerfile: ${{ needs.release-versions.outputs.rc-dockerfile }}
