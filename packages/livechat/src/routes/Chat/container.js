@@ -153,6 +153,17 @@ class ChatContainer extends Component {
 		this.startTyping({ rid: room._id, username: user.username });
 	};
 
+	setLastReadMessageIdAndResetUnreadCounter = (message) => {
+		if (!message?.message?._id) {
+			return;
+		}
+
+		store.setState({
+			lastReadMessageId: message.message._id,
+			unread: 0,
+		});
+	};
+
 	handleSubmit = async (msg) => {
 		if (msg.trim() === '') {
 			return;
@@ -164,7 +175,10 @@ class ChatContainer extends Component {
 
 		try {
 			this.stopTypingDebounced.stop();
-			await Promise.all([this.stopTyping({ rid, username: user.username }), Livechat.sendMessage({ msg, token, rid })]);
+
+			const [, message] = await Promise.all([this.stopTyping({ rid, username: user.username }), Livechat.sendMessage({ msg, token, rid })]);
+
+			this.setLastReadMessageIdAndResetUnreadCounter(message);
 		} catch (error) {
 			const reason = error?.error ?? error.message;
 			const alert = { id: createToken(), children: reason, error: true, timeout: 5000 };
