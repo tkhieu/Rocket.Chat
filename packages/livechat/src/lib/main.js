@@ -107,24 +107,36 @@ export const getUnreadMessages = () => {
 };
 
 export const processUnread = async () => {
-	const shouldMarkUnread = shouldMarkAsUnread();
-	if (shouldMarkUnread) {
-		const unreadMessages = getUnreadMessages();
-
-		if (unreadMessages.length > 0) {
-			const { alerts } = store.state;
-			const lastReadMessage = getLastReadMessage();
-			const alertMessage = i18next.t('count_new_messages_since_since', {
-				count: unreadMessages.length,
-				val: new Date(lastReadMessage.ts),
-				formatParams: {
-					val: { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
-				},
-			});
-
-			const alert = { id: constants.unreadMessagesAlertId, children: alertMessage, success: true, timeout: 0 };
-			const newAlerts = alerts.filter((item) => item.id !== constants.unreadMessagesAlertId);
-			await store.setState({ alerts: (newAlerts.push(alert), newAlerts), unread: unreadMessages.length });
-		}
+	if (!shouldMarkAsUnread()) {
+		return;
 	}
+
+	const unreadMessages = getUnreadMessages();
+	if (!unreadMessages.length) {
+		return;
+	}
+
+	const lastReadMessage = getLastReadMessage();
+	const alertMessage = i18next.t('count_new_messages_since_since', {
+		count: unreadMessages.length,
+		val: new Date(lastReadMessage.ts),
+		formatParams: {
+			val: { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
+		},
+	});
+	const alert = {
+		id: constants.unreadMessagesAlertId,
+		children: alertMessage,
+		success: true,
+		timeout: 0,
+	};
+
+	const { alerts } = store.state;
+	const newAlerts = alerts.filter((item) => item.id !== constants.unreadMessagesAlertId);
+	newAlerts.push(alert);
+
+	await store.setState({
+		alerts: newAlerts,
+		unread: unreadMessages.length,
+	});
 };
