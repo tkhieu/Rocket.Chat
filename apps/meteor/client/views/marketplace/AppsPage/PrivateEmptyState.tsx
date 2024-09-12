@@ -1,19 +1,21 @@
-import { States, StatesIcon, StatesTitle, StatesSubtitle, Box } from '@rocket.chat/fuselage';
-import { useTranslation } from '@rocket.chat/ui-contexts';
+import { Box, Skeleton } from '@rocket.chat/fuselage';
+import { usePermission } from '@rocket.chat/ui-contexts';
 import React from 'react';
 
-const PrivateEmptyState = () => {
-	const t = useTranslation();
+import { useLicense } from '../../../hooks/useLicense';
+import PrivateEmptyStateDefault from './PrivateEmptyStateDefault';
+import PrivateEmptyStateUpgrade from './PrivateEmptyStateUpgrade';
 
-	return (
-		<Box mbs='24px'>
-			<States>
-				<StatesIcon name='lock' />
-				<StatesTitle>{t('No_private_apps_installed')}</StatesTitle>
-				<StatesSubtitle>{t('Private_apps_are_side-loaded')}</StatesSubtitle>
-			</States>
-		</Box>
-	);
+const PrivateEmptyState = () => {
+	const { data, isLoading } = useLicense({ loadValues: true });
+	const { limits } = data || {};
+	const isAdmin = usePermission('manage-apps');
+
+	if (isLoading) {
+		return <Skeleton />;
+	}
+
+	return <Box mbs='24px'>{isAdmin && limits?.privateApps?.max === 0 ? <PrivateEmptyStateUpgrade /> : <PrivateEmptyStateDefault />}</Box>;
 };
 
 export default PrivateEmptyState;
