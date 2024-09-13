@@ -591,7 +591,10 @@ export const isChatGetMentionedMessagesProps = ajv.compile<GetMentionedMessages>
 
 type ChatSyncMessages = {
 	roomId: IRoom['_id'];
-	lastUpdate: string;
+	lastUpdate?: string;
+	count?: number;
+	next?: string;
+	previous?: string;
 };
 
 const ChatSyncMessagesSchema = {
@@ -602,9 +605,22 @@ const ChatSyncMessagesSchema = {
 		},
 		lastUpdate: {
 			type: 'string',
+			nullable: true,
+		},
+		count: {
+			type: 'number',
+			nullable: true,
+		},
+		next: {
+			type: 'string',
+			nullable: true,
+		},
+		previous: {
+			type: 'string',
+			nullable: true,
 		},
 	},
-	required: ['roomId', 'lastUpdate'],
+	required: ['roomId'],
 	additionalProperties: false,
 };
 
@@ -952,6 +968,10 @@ export type ChatEndpoints = {
 			result: {
 				updated: IMessage[];
 				deleted: IMessage[];
+				cursor: {
+					next: string | null;
+					previous: string | null;
+				};
 			};
 		};
 	};
